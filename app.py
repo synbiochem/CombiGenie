@@ -7,27 +7,30 @@ To view a copy of this license, visit <http://opensource.org/licenses/MIT/>.
 
 @author:  neilswainston
 '''
-import os
 import sys
 import uuid
 
-from flask import Flask
+from flask import Flask, make_response
 
+_EXCEL = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
 
 # Configuration:
-DEBUG = True
+DEBUG = False
 SECRET_KEY = str(uuid.uuid4())
 
 # Create application:
-_STATIC_FOLDER = os.path.dirname(os.path.realpath(__file__))
-APP = Flask(__name__, static_folder=_STATIC_FOLDER)
+APP = Flask(__name__)
 APP.config.from_object(__name__)
 
 
 @APP.route('/')
-def home():
-    '''Renders homepage.'''
-    return APP.send_static_file('CombiGenie.xlsx')
+def root():
+    '''Root.'''
+    response = make_response(APP.send_static_file('CombiGenie.xlsx'))
+    response.headers['Content-Type'] = _EXCEL
+    response.headers['Content-Disposition'] = \
+        'attachment; filename="CombiGenie.xlsx"'
+    return response
 
 
 def main(argv):
